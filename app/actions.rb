@@ -7,7 +7,6 @@ end
 get '/' do
   @finstagram_posts = FinstagramPost.order(created_at: :desc)
   erb(:index)
-
 end
 
 get '/signup' do     
@@ -51,9 +50,30 @@ post '/signup' do
     redirect to('/login')
   else
     erb(:signup)
-  end
-  
+  end    
 end
 
+#handle the HTTP GET fo the path '/finstagram_post/:id'
+get '/finstagram_posts/new' do
+  @finstagram_post = FinstagramPost.new
+  erb(:"finstagram_posts/new")
+end
 
+get '/finstagram_posts/:id' do
+  @finstagram_post = FinstagramPost.find(params[:id])   # find the finstagram post with the ID from the URL
+  erb(:"finstagram_posts/show")               # render app/views/finstagram_posts/show.erb
+end
+ 
+post '/finstagram_posts' do
+  photo_url = params[:photo_url]
 
+  @finstagram_post = FinstagramPost.new({ photo_url: photo_url, user_id: current_user.id})
+
+  # if @post validates, save
+  if @finstagram_post.save
+    redirect(to('/'))
+  else
+    # if it doesn't validate, print error messages ( by passing it to the neww.erb file)
+    erb(:"finstagram_posts/new")
+  end
+end
